@@ -36,33 +36,57 @@ class SpeechFeatures:
     '''
 
     def __init__(self, wav_id, win_size, win_step, nfft, nfilt, ndct,
-                 win_fun=np.hamming, pre_emp=None):
+                 win_fun=np.hamming, pre_emp=None, sig=None, srate=None):
+        # Purpose of srate is to resample original wav file
+
         # Get variables
-        self.wav_id = wav_id
+        self.wav_id = wav_id # can be None
         self.win_size = win_size
         self.win_step = win_step
         self.nfft = nfft
         self.nfilt = nfilt
         self.ndct = ndct
         self.pre_emp = pre_emp
-        # Load wav
-        self._load_wav()
+        self.sig = sig
+        self.srate = srate
 
-    def _load_wav(self):
+        # Load wav or wav data
+        if all([sig, srate]):
+            # if sig & srate are provided,
+            self.sig, self.srate = sig, srate
+            self._pre_emp(self.sig)
+        elif any([sig, srate]):
+            self.sig, self.srate = sig, srate
+            if self.srate is None:
+                raise Exception('Provide sig with srate!\nWe need samplerate!!')
+        elif wav_id is not None:
+            if srate is None:
+                self._load_wav()
+                self._pre_emp(self.sig)
+            else:
+                self._load_wav(srate=srate)
+                self._pre_emp(self.sig)
+
+    def _load_wav(self, srate=None):
         '''Load wav file'''
-        try:
-            self.srate, sig = wavfile.read(self.wav_id)
-        except:
-            # TIMIT has b'NIST' format which throws error
-            # when using scipy.io.wavfile.read
-            sig, self.srate = librosa.load(self.wav_id, sr=None)
-        # Preemphasis
-        if self.pre_emp:
-            # Check value range (0 ~ 1)
-            assert (self.pre_emp <= 1) & (self.pre_emp > 0)
-            self.sig = np.append(sig[0], sig[1:] - self.pre_emp * sig[:-1])
-        else:
-            self.sig = sig
+        # Resample
+        if srate is not None: # if srate is provided
+            sig, self.srate = librosa.load(self.wav_id, sr=srate)
+        else: 
+            try: # if srate is NOT provided
+                self.srate, sig = wavfile.read(self.wav_id)
+            except:
+                # TIMIT has b'NIST' format which throws error
+                # when using scipy.io.wavfile.read
+                sig, self.srate = librosa.load(self.wav_id, sr=None)
+        self.sig = sig
+
+    def _pre_emp(self, sig):
+        '''Preemphasis'''
+        # Check value range (0 ~ 1)
+        assert (self.pre_emp <= 1) & (self.pre_emp > 0)
+        self.sig = np.append(sig[0], sig[1:] - self.pre_emp * sig[:-1])
+            
 
     def _get_frames_windowed(self, sig=None):
         '''Windowing each frame
@@ -116,7 +140,7 @@ class SpeechFeatures:
         log_frames = 10 * np.log10(_pow_frames)  # See pow2db() in Matlab
 
         if linfilt:
-            if not nfilt:
+            if nfilt is None:
                 nfilt = self.nfilt
             bins, hz_points = self._make_bins_hz(nfilt)
             fbank = self._make_filter_banks(bins, nfft, nfilt)
@@ -165,14 +189,16 @@ class SpeechFeatures:
         mfcc -= (np.mean(mfcc, axis=0) + 1e-8)
         return mfcc
 
-    def get_melfilt(self, nfft=None, nfilt=None, pow_frames=None):
+    def get_melfilt(self, sig=None, nfft=None, nfilt=None, pow_frames=None):
         '''Compute Mel filterbanks'''
+        if sig is None:
+            sig = self.sig
         if nfft is None:
             nfft = self.nfft
         if nfilt is None:
             nfilt = self.nfilt
         if pow_frames is None:
-            _, pow_frames, _ = self.get_fft()
+            _, pow_frames, _ = self.get_fft(sig=sig)
 
         bins, hz_points = self._make_bins_hz(nfilt, melscale=True)
         fbank = self._make_filter_banks(bins, nfft, nfilt)
@@ -285,7 +311,9 @@ class SpeechFeatures:
 
 
 if __name__ == '__main__':
+    ######################
     ### Test this code ###
+    ######################
     wav_id = 'mngu0_s1_0001.wav'
     # Parameters
     pre_emp = 0.97
