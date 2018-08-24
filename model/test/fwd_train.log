@@ -1,29 +1,19 @@
-11:55:31 - train - learning_rate: 0.01
-11:55:31 - train - training_epochs: 2000
-11:55:31 - train - n_display: 100
-11:55:31 - train - train_x: (31021, 40), train_y: (31021,)
-11:55:31 - train - test_x: (7756, 40), test_y: (7756,)
+14:21:52 - train - learning_rate: 0.01
+14:21:52 - train - training_epochs: 2000
+14:21:52 - train - n_display: 200
+14:21:52 - train - train_x: (31021, 15), train_y: (31021,)
+14:21:52 - train - test_x: (7756, 15), test_y: (7756,)
 
-11:55:31 - train - Hidden size: 500 -> 200 -> 50
-11:55:31 - train - final_output_size: 9
+14:21:52 - train - Hidden size: 200 -> 200 -> 200
+14:21:52 - train - final_output_size: 9
 
-11:55:34 - train -  100/2000 train: CE=0.8164, train_acc:0.70, test: CE=0.8355, test_acc:0.69 slop=0.83553
-11:55:35 - train -  200/2000 train: CE=0.7213, train_acc:0.73, test: CE=0.8055, test_acc:0.70 slop=-0.02999
-11:55:37 - train -  300/2000 train: CE=0.6656, train_acc:0.75, test: CE=0.8020, test_acc:0.70 slop=-0.00352
-11:55:38 - train -  400/2000 train: CE=0.6265, train_acc:0.77, test: CE=0.8093, test_acc:0.71 slop=0.00727
-11:55:40 - train -  500/2000 train: CE=0.5998, train_acc:0.78, test: CE=0.8281, test_acc:0.71 slop=0.01885
-11:55:41 - train -  600/2000 train: CE=0.5758, train_acc:0.78, test: CE=0.8434, test_acc:0.70 slop=0.01523
-11:55:42 - train -  700/2000 train: CE=0.5594, train_acc:0.79, test: CE=0.8537, test_acc:0.70 slop=0.01035
-11:55:44 - train -  800/2000 train: CE=0.5360, train_acc:0.80, test: CE=0.8609, test_acc:0.71 slop=0.00718
-11:55:46 - train -  900/2000 train: CE=0.5160, train_acc:0.81, test: CE=0.8753, test_acc:0.70 slop=0.01435
-11:55:47 - train - 1000/2000 train: CE=0.5143, train_acc:0.81, test: CE=0.8965, test_acc:0.70 slop=0.02125
-11:55:49 - train - 1100/2000 train: CE=0.5038, train_acc:0.81, test: CE=0.8970, test_acc:0.71 slop=0.00053
-11:55:51 - train - 1200/2000 train: CE=0.4901, train_acc:0.82, test: CE=0.9098, test_acc:0.70 slop=0.01277
-11:55:53 - train - 1300/2000 train: CE=0.4784, train_acc:0.82, test: CE=0.9241, test_acc:0.70 slop=0.01428
-11:55:54 - train - 1400/2000 train: CE=0.4720, train_acc:0.82, test: CE=0.9284, test_acc:0.70 slop=0.00431
-11:55:56 - train - 1500/2000 train: CE=0.4600, train_acc:0.83, test: CE=0.9393, test_acc:0.71 slop=0.01089
-11:55:58 - train - 1600/2000 train: CE=0.4523, train_acc:0.83, test: CE=0.9497, test_acc:0.70 slop=0.01038
-11:56:00 - train - 1700/2000 train: CE=0.4440, train_acc:0.83, test: CE=0.9652, test_acc:0.70 slop=0.01555
-11:56:01 - train - 1800/2000 train: CE=0.4253, train_acc:0.84, test: CE=0.9766, test_acc:0.70 slop=0.01143
-11:56:03 - train - 1900/2000 train: CE=0.4267, train_acc:0.84, test: CE=0.9868, test_acc:0.70 slop=0.01013
-11:56:05 - train - 2000/2000 train: CE=0.4150, train_acc:0.84, test: CE=0.9991, test_acc:0.70 slop=0.01229
+14:21:55 - train -  200/2000 train: CE=0.9445, train_acc:0.64, test: CE=0.9116, test_acc:0.65 slop=0.91156
+14:21:57 - train -  400/2000 train: CE=0.8913, train_acc:0.66, test: CE=0.8884, test_acc:0.66 slop=-0.02318
+14:21:59 - train -  600/2000 train: CE=0.8580, train_acc:0.67, test: CE=0.8838, test_acc:0.66 slop=-0.00455
+14:22:02 - train -  800/2000 train: CE=0.8273, train_acc:0.68, test: CE=0.8815, test_acc:0.67 slop=-0.00236
+14:22:04 - train - 1000/2000 train: CE=0.7982, train_acc:0.69, test: CE=0.8839, test_acc:0.67 slop=0.00239
+14:22:06 - train - 1200/2000 train: CE=0.7786, train_acc:0.70, test: CE=0.8825, test_acc:0.67 slop=-0.00136
+14:22:08 - train - 1400/2000 train: CE=0.7480, train_acc:0.71, test: CE=0.8859, test_acc:0.68 slop=0.00343
+14:22:11 - train - 1600/2000 train: CE=0.7408, train_acc:0.72, test: CE=0.8915, test_acc:0.67 slop=0.00553
+14:22:13 - train - 1800/2000 train: CE=0.7214, train_acc:0.72, test: CE=0.9010, test_acc:0.67 slop=0.00950
+14:22:15 - train - 2000/2000 train: CE=0.7115, train_acc:0.73, test: CE=0.9082, test_acc:0.67 slop=0.00727
