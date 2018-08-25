@@ -48,6 +48,7 @@ def update_plot(frame):
 
 
 def init_plot(dada, obj):
+    global p
     '''Initialize axes and plot obj/data'''
     # Set plot data
     data['linfilt'] = np.zeros((p.nfilt, 1))  # (40,1)
@@ -65,7 +66,7 @@ def init_plot(dada, obj):
     ax1.set_xticklabels([f'{t+1:d}' for t in range(p.nfilt)])
     ax1.set_ylim([60, 220])
     ax1.tick_params(rotation=90)
-    ax1.set_xlabel('40 Filters')
+    ax1.set_xlabel('40 Filters (reconstructed from 15 PCs)')
 
     ax2.set_title('Vowel probabilities')
     ax2.set_xticks(range(len(phones)))
