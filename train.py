@@ -8,12 +8,6 @@ from time import gmtime, strftime
 import logging
 
 
-def softmax_fun(x):
-    '''Numerically stable softmax'''
-    e_x = np.exp(x - np.max(x))
-    return e_x / e_x.sum()
-
-
 def train_nn(train_data, test_data, vowels, training_epochs=1000, n_display=100, verbose=True, model_dir=None):
     '''ref: https://github.com/hunkim/DeepLearningZeroToAll'''
     if model_dir:
@@ -66,7 +60,7 @@ def train_nn(train_data, test_data, vowels, training_epochs=1000, n_display=100,
     Yonehot = tf.one_hot(Y, depth=len(vowels))
 
 #     hidden_output_size = 500
-    nhid1, nhid2, nhid3 = 500, 200, 50
+    nhid1, nhid2, nhid3 = 200, 200, 200
     final_output_size = ydim
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
     

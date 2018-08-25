@@ -33,7 +33,7 @@ class hparams:
     win_size = 0.025
     win_step = 0.01
     preemp = 0.97
-    n_comp = 40  # PCs
+    n_comp = 15  # PCs (15 PCs were decided to use)
     nfilt = 40  # filter no.
 
 
