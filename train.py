@@ -60,7 +60,7 @@ def train_nn(train_data, test_data, vowels, training_epochs=1000, n_display=100,
     Yonehot = tf.one_hot(Y, depth=len(vowels))
 
 #     hidden_output_size = 500
-    nhid1, nhid2, nhid3 = 200, 200, 200
+    nhid1, nhid2, nhid3 = 400, 200, 100
     final_output_size = ydim
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
     
@@ -83,12 +83,13 @@ def train_nn(train_data, test_data, vowels, training_epochs=1000, n_display=100,
     W3 = tf.get_variable("W3", shape=[nhid2, nhid3],
                          initializer=tf.contrib.layers.xavier_initializer(uniform=False))  # 300x300
     b3 = tf.Variable(tf.random_normal([nhid3]))  # 300
-    L3 = tf.nn.relu(tf.matmul(L2, W3) + b3)  # 300x300
+    L3 = tf.nn.relu(tf.matmul(drop2, W3) + b3)  # 300x300
+    drop3 = tf.nn.dropout(L3, keep_prob)
 
     W4 = tf.get_variable("W4", shape=[nhid3, final_output_size],
                          initializer=tf.contrib.layers.xavier_initializer(uniform=False))  # 300x3
     b4 = tf.Variable(tf.random_normal([final_output_size]))  # 3
-    logits = tf.add(tf.matmul(L3, W4), b4, name='logits')
+    logits = tf.add(tf.matmul(drop3, W4), b4, name='logits')
     softmax = tf.nn.softmax(logits, name='softmax')
     # Prediction
     pred = tf.round(tf.argmax(softmax, axis=1, name='prediction'))
@@ -114,6 +115,11 @@ def train_nn(train_data, test_data, vowels, training_epochs=1000, n_display=100,
 
         disp_cnt = 0
         for i in range(training_epochs):
+            # SGD
+            ridx = np.arange(trainx.shape[0])
+            np.random.shuffle(ridx);
+            trainx, trainy = trainx[ridx], trainy[ridx]
+            
             opt, train_c, train_acc = sess.run([optimizer, cost, accuracy], 
                                                feed_dict={X: trainx, Y: trainy, keep_prob: 0.5})
             if (i + 1) % n_display == 0:
@@ -218,10 +224,8 @@ def forward(X, params):
     L1 = relu(np.dot(X, W1) + b1) # Nx300
     L2 = relu(np.dot(L1, W2) + b2) # Nx300
     L3 = relu(np.dot(L2, W3) + b3) # Nx300
-    L4 = relu(np.dot(L3, W4) + b4) # Nx300
-#     L1 = sigmoid(np.dot(X, W1) + b1)  # Nx300
-#     L2 = sigmoid(np.dot(L1, W2) + b2)  # Nx300
-    return softmax(L4)
+    L4 = np.dot(L3, W4) + b4 # Nx300
+    return softmax_stable(L4)
 
 
 def sigmoid(X):
@@ -230,6 +234,10 @@ def sigmoid(X):
 def relu(X):
     return np.maximum(X, 0, X)
 
-def softmax(X):
-    e_x = np.exp(X - np.max(X))
-    return e_x / e_x.sum()
+def softmax_stable(X):
+    e_x = np.exp(X - np.max(X), dtype=np.float32)
+    return np.true_divide(e_x, np.tile(np.sum(e_x, axis=1, keepdims=True), e_x.shape[1]))
+
+def softmax_raw(X):
+    e_x = np.exp(X, dtype=np.float32)
+    return np.true_divide(e_x, np.tile(np.sum(e_x, axis=1, keepdims=True), e_x.shape[1]))
