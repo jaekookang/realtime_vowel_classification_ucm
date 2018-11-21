@@ -25,7 +25,7 @@ import queue
 
 def update_plot(frame):
     '''Update plots'''
-    global data, obj, buf, q
+    global data, obj, txt, buf, q
     while True:
         try:
             _data, _ = q.get_nowait()
@@ -44,11 +44,24 @@ def update_plot(frame):
         obj['linfilt'][0].set_ydata(X_recovered)
         for i, prb in enumerate(prob[0]):
             obj['bars'][i].set_height(prb)
-    return [obj['linfilt'][0]] + [b for b in obj['bars']]
+            if np.max(prob) == prb:
+                # Mark the highest probable vowel
+                obj['bars'][i].set_color('r')
+                txt.set_text(f'{phones[i]}: {prb:.1f} %')
+                txt.set_position((i, prb))
+                txt.set_size(12)
+                txt.set_color('black')
+            else:
+                obj['bars'][i].set_color('b')
+                txt.set_text('')
+            '''
+            왜 텍스트가 제대로 안뜨는지 확인할것
+            '''
+    return [obj['linfilt'][0]] + [b for b in obj['bars']] + [txt]
 
 
 def init_plot(dada, obj):
-    global p
+    # global p
     '''Initialize axes and plot obj/data'''
     # Set plot data
     data['linfilt'] = np.zeros((p.nfilt, 1))  # (40,1)
@@ -75,8 +88,10 @@ def init_plot(dada, obj):
     ax2.set_yticklabels([f'{t:.1f}' for t in np.linspace(0, 1, 11)])
     ax2.set_xlabel('9 selected vowels')
     ax2.set_ylabel('Probability')
+    # Set label holder
+    txt = ax2.text(len(phones), 0.9, 'TEST')
     fig.tight_layout(pad=3)
-    return fig, data, obj
+    return fig, data, obj, txt
 
 
 def init_buf():
@@ -97,9 +112,9 @@ class Record(threading.Thread):
         self.kill_received = False
 
         # Open inputstream
-        self.streamflow = sd.InputStream(device=p.device, channels=p.channels,
-                                         samplerate=p.samplerate, blocksize=p.blocksize,
-                                         dtype='int16')
+        self.streamflow = sd.InputStream(
+            device=p.device, channels=p.channels, samplerate=p.samplerate,
+            blocksize=p.blocksize, dtype='int16')
         self.streamflow.start()
 
     def run(self):
@@ -152,7 +167,7 @@ if __name__ == '__main__':
     # Initialize data & plots
     data = dict(linfilt=None, bars=None)
     obj = dict(linfilt=None, bars=None)
-    fig, data, obj = init_plot(data, obj)
+    fig, data, obj, txt = init_plot(data, obj)
 
     # Start audio stream
     stream = Record(q)
