@@ -18,6 +18,7 @@ def read_mat(matfile):
     FileID = re.sub('.mat', '', os.path.basename(matfile))
     return loadmat(matfile)[FileID]
 
+
 def find_elements(pattern, my_list):
     '''Find elements in a list'''
     elements = []
@@ -34,15 +35,15 @@ def get_palate(mat, which_spkr):
     '''Select (pal, pha) for which_spkr'''
     pal = [m[1] for m in mat if m[0][0] == which_spkr][0]
     pha = [m[2] for m in mat if m[0][0] == which_spkr][0]
-    return pal, pha    
+    return pal, pha
 
 
 def remove_short_tokens(df, which_spkr, threshold=0.03):
     '''
     Remove short tokens (default < 30ms)
     '''
-    n_samples = df.loc[df.Subj==which_spkr].shape[0]
-    tmp = df.loc[(df.Subj==which_spkr)&(df.Dur<threshold)]
+    n_samples = df.loc[df.Subj == which_spkr].shape[0]
+    tmp = df.loc[(df.Subj == which_spkr) & (df.Dur < threshold)]
     n_trimmed = tmp.shape[0]
     df.drop(tmp.index, inplace=True)
     print(f'{which_spkr}: {n_samples} --> {n_samples-n_trimmed} ({n_trimmed})')
@@ -58,9 +59,10 @@ def iqr_bounds(df, col, lb=0.25, ub=0.75):
     q1 = df[col].quantile(lb)
     q3 = df[col].quantile(ub)
     IQR = q3 - q1
-    lrbound = q1 - 1.5*IQR
-    upbound = q3 + 1.5*IQR
+    lrbound = q1 - 1.5 * IQR
+    upbound = q3 + 1.5 * IQR
     return lrbound, upbound
+
 
 def remove_acous_outlier(df, which_spkr, which_vowel, lower_bound=0.25, upper_bound=0.75):
     '''
@@ -69,19 +71,22 @@ def remove_acous_outlier(df, which_spkr, which_vowel, lower_bound=0.25, upper_bo
     lb: lower bound
     ub: upper bound
     '''
-    d = df.loc[(df.Subj==which_spkr)&(df.Label==which_vowel)]
+    d = df.loc[(df.Subj == which_spkr) & (df.Label == which_vowel)]
     # F1
     lb, ub = iqr_bounds(d, 'F1', lb=lower_bound, ub=upper_bound)
-    f1outLier = df.loc[(df.Subj==which_spkr)&(df.Label==which_vowel)&((df.F1<lb)|(df.F1>ub))]
-    df.drop(f1outLier.index, inplace=True) # no need to reassign
+    f1outLier = df.loc[(df.Subj == which_spkr) & (
+        df.Label == which_vowel) & ((df.F1 < lb) | (df.F1 > ub))]
+    df.drop(f1outLier.index, inplace=True)  # no need to reassign
     # F2
     lb, ub = iqr_bounds(d, 'F2', lb=lower_bound, ub=upper_bound)
-    f2outLier = df.loc[(df.Subj==which_spkr)&(df.Label==which_vowel)&((df.F2<lb)|(df.F2>ub))]
-    df.drop(f2outLier.index, inplace=True) # no need to reassign
+    f2outLier = df.loc[(df.Subj == which_spkr) & (
+        df.Label == which_vowel) & ((df.F2 < lb) | (df.F2 > ub))]
+    df.drop(f2outLier.index, inplace=True)  # no need to reassign
     # F3
     lb, ub = iqr_bounds(d, 'F3', lb=lower_bound, ub=upper_bound)
-    f3outLier = df.loc[(df.Subj==which_spkr)&(df.Label==which_vowel)&((df.F3<lb)|(df.F3>ub))]
-    df.drop(f3outLier.index, inplace=True) # no need to reassign
+    f3outLier = df.loc[(df.Subj == which_spkr) & (
+        df.Label == which_vowel) & ((df.F3 < lb) | (df.F3 > ub))]
+    df.drop(f3outLier.index, inplace=True)  # no need to reassign
     return df, (f1outLier, f2outLier, f3outLier)
 
 
@@ -91,11 +96,11 @@ def normalize_formants(formants, mu=None, sigma=None):
     You can later append it to the original data frame.
 
     If (mu, sigma) is provided, formants will be normalized with these values.
-    
+
     Arguments
       formants: formant frequencies; e.g., N x 3 numpy array
       (optionally) mu: mean value, sigma: standard deviation to use
-    
+
     Output
       normalized: normalized formants; e.g., N x 3 numpy array
       mu: mean
@@ -104,12 +109,12 @@ def normalize_formants(formants, mu=None, sigma=None):
     # Check if NaNs
     if np.isnan(formants).any():
         print('WARNING: NaN values were found')
-        
+
     if not (mu is None and sigma is None):
         return (formants - mu) / sigma, mu, sigma
     else:
-        mu = np.nanmean(formants, axis=0, keepdims=True) # ignore NaNs
-        sigma = np.nanstd(formants, axis=0, keepdims=True) # ignore NaNs
+        mu = np.nanmean(formants, axis=0, keepdims=True)  # ignore NaNs
+        sigma = np.nanstd(formants, axis=0, keepdims=True)  # ignore NaNs
         return (formants - mu) / sigma, mu, sigma
 
 
@@ -117,10 +122,10 @@ def normalize_pellets(pellets):
     '''
     This function normalizes (z-score) pellet xy coordinates and outputs the normalized pellets.
     You can later append it to the original data frame.
-    
+
     Arguments
       pellets: pellet xy coordinates; e.g., N x 12 numpy array
-      
+
     Output
       normalized: normalized pellets; e.g., N x 12 numpy array
       mu: mean
@@ -128,15 +133,15 @@ def normalize_pellets(pellets):
     '''
     if np.isnan(pellets).any():
         print('WARNING: NaN values were found')
-    mu = np.nanmean(pellets, axis=0, keepdims=True) # ignore NaNs
-    sigma = np.nanstd(pellets, axis=0, keepdims=True) # ignore NaNs
+    mu = np.nanmean(pellets, axis=0, keepdims=True)  # ignore NaNs
+    sigma = np.nanstd(pellets, axis=0, keepdims=True)  # ignore NaNs
     return (pellets - mu) / sigma, mu, sigma
 
 
 def run_pca(norm_pellets, n_comp=5, apply_factor_analysis=False):
     '''
     This function runs PCA on normalized pellet data and returns pca object
-    
+
     apply_factor_analysis will be considered for the factor analysis (TODO)
     '''
     pca = PCA(n_components=n_comp)
@@ -152,16 +157,16 @@ def zscore_reverse(zdata, mu, sigma):
     '''
     This function returns raw values from zscored data with mu and sigma
     '''
-    return zdata*sigma + mu
+    return zdata * sigma + mu
 
 
 def calc_rmse(y, yhat):
     '''
     Calculate a root mean-squared error
-    
+
     rmse = 1/n sqrt( 1/m * (y - yhat)^2 )
     '''
-    return np.mean(np.sqrt(np.mean(np.square(y-yhat), axis=1)))
+    return np.mean(np.sqrt(np.mean(np.square(y - yhat), axis=1)))
 
 
 def zscore_reverse_all(data, formant_zscore, which_spkr):
@@ -193,7 +198,7 @@ def get_mean_absolute_error(y, yhat):
     else:
         return np.mean(np.absolute(y - yhat), axis=0)
 
-    
+
 def rank(A, atol=1e-13, rtol=0):
     """Estimate the rank (i.e. the dimension of the nullspace) of a matrix.
 
@@ -275,3 +280,17 @@ def nullspace(A, atol=1e-13, rtol=0):
     nnz = (s >= tol).sum()
     ns = vh[nnz:].conj().T
     return ns
+
+
+def compute_ucm_cm_vector(A, atol=1e-13, rtol=0):
+    '''
+    This function returns ucm and cm vector(s)
+    based on nullspace function
+    '''
+    A = np.atleast_2d(A)
+    u, s, vh = svd(A)
+    tol = max(atol, rtol * s[0])
+    nnz = (s >= tol).sum()
+    ucmSpaceVector = vh[nnz:].conj().T
+    cmSpaceVector = vh[:nnz].conj().T
+    return ucmSpaceVector, cmSpaceVector
